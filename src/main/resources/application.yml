@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: dance-service
+  jackson:
+    serialization:
+      indent_output: true
+  profiles:
+    active: ${env}
+  http:
+    encoding:
+      charset: UTF-8
+
+server:
+  port: 9090
+  servlet-path: /api
+
+logging:
+  config: classpath:log4j2.xml
+  level:
+    com:
+      champion:
+        dance:
+          domain:
+            mapper: ${log.level}
+
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath*:com/champion/dance/domain/mapper/**/*.xml
+  type-aliases-package: com.champion.dance.domain.entity

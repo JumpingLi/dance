@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.champion.dance.domain.mapper.CourseMapper" >
+  <resultMap id="BaseResultMap" type="com.champion.dance.domain.entity.Course" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="teacher_id" property="teacherId" jdbcType="VARCHAR" />
+    <result column="dance_id" property="danceId" jdbcType="VARCHAR" />
+    <result column="studio_id" property="studioId" jdbcType="VARCHAR" />
+    <result column="studio_name" property="studioName" jdbcType="VARCHAR" />
+    <result column="dance_name" property="danceName" jdbcType="VARCHAR" />
+    <result column="week_date" property="weekDate" jdbcType="TINYINT" />
+    <result column="begin_time" property="beginTime" jdbcType="TIME" />
+    <result column="end_time" property="endTime" jdbcType="TIME" />
+    <result column="complexity" property="complexity" jdbcType="TINYINT" />
+    <result column="total_amount" property="totalAmount" jdbcType="TINYINT" />
+    <result column="alive_amount" property="aliveAmount" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, teacher_id, dance_id, studio_id, studio_name, dance_name, week_date, begin_time, 
+    end_time, complexity, total_amount, alive_amount
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from course
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="findAllCourse" resultMap="BaseResultMap" parameterType="java.time.DayOfWeek" >
+    select
+    <include refid="Base_Column_List" />
+    from course
+    where week_date = #{dayOfWeek,jdbcType=TINYINT}
+    ORDER BY begin_time ASC
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from course
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.champion.dance.domain.entity.Course" >
+    insert into course (id, teacher_id, dance_id, 
+      studio_id, studio_name, dance_name, 
+      week_date, begin_time, end_time, 
+      complexity, total_amount, alive_amount
+      )
+    values (#{id,jdbcType=VARCHAR}, #{teacherId,jdbcType=VARCHAR}, #{danceId,jdbcType=VARCHAR}, 
+      #{studioId,jdbcType=VARCHAR}, #{studioName,jdbcType=VARCHAR}, #{danceName,jdbcType=VARCHAR}, 
+      #{weekDate,jdbcType=TINYINT}, #{beginTime,jdbcType=TIME}, #{endTime,jdbcType=TIME}, 
+      #{complexity,jdbcType=TINYINT}, #{totalAmount,jdbcType=TINYINT}, #{aliveAmount,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.champion.dance.domain.entity.Course" >
+    insert into course
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="teacherId != null" >
+        teacher_id,
+      </if>
+      <if test="danceId != null" >
+        dance_id,
+      </if>
+      <if test="studioId != null" >
+        studio_id,
+      </if>
+      <if test="studioName != null" >
+        studio_name,
+      </if>
+      <if test="danceName != null" >
+        dance_name,
+      </if>
+      <if test="weekDate != null" >
+        week_date,
+      </if>
+      <if test="beginTime != null" >
+        begin_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="complexity != null" >
+        complexity,
+      </if>
+      <if test="totalAmount != null" >
+        total_amount,
+      </if>
+      <if test="aliveAmount != null" >
+        alive_amount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherId != null" >
+        #{teacherId,jdbcType=VARCHAR},
+      </if>
+      <if test="danceId != null" >
+        #{danceId,jdbcType=VARCHAR},
+      </if>
+      <if test="studioId != null" >
+        #{studioId,jdbcType=VARCHAR},
+      </if>
+      <if test="studioName != null" >
+        #{studioName,jdbcType=VARCHAR},
+      </if>
+      <if test="danceName != null" >
+        #{danceName,jdbcType=VARCHAR},
+      </if>
+      <if test="weekDate != null" >
+        #{weekDate,jdbcType=TINYINT},
+      </if>
+      <if test="beginTime != null" >
+        #{beginTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="complexity != null" >
+        #{complexity,jdbcType=TINYINT},
+      </if>
+      <if test="totalAmount != null" >
+        #{totalAmount,jdbcType=TINYINT},
+      </if>
+      <if test="aliveAmount != null" >
+        #{aliveAmount,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.champion.dance.domain.entity.Course" >
+    update course
+    <set >
+      <if test="teacherId != null" >
+        teacher_id = #{teacherId,jdbcType=VARCHAR},
+      </if>
+      <if test="danceId != null" >
+        dance_id = #{danceId,jdbcType=VARCHAR},
+      </if>
+      <if test="studioId != null" >
+        studio_id = #{studioId,jdbcType=VARCHAR},
+      </if>
+      <if test="studioName != null" >
+        studio_name = #{studioName,jdbcType=VARCHAR},
+      </if>
+      <if test="danceName != null" >
+        dance_name = #{danceName,jdbcType=VARCHAR},
+      </if>
+      <if test="weekDate != null" >
+        week_date = #{weekDate,jdbcType=TINYINT},
+      </if>
+      <if test="beginTime != null" >
+        begin_time = #{beginTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="complexity != null" >
+        complexity = #{complexity,jdbcType=TINYINT},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=TINYINT},
+      </if>
+      <if test="aliveAmount != null" >
+        alive_amount = #{aliveAmount,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.champion.dance.domain.entity.Course" >
+    update course
+    set teacher_id = #{teacherId,jdbcType=VARCHAR},
+      dance_id = #{danceId,jdbcType=VARCHAR},
+      studio_id = #{studioId,jdbcType=VARCHAR},
+      studio_name = #{studioName,jdbcType=VARCHAR},
+      dance_name = #{danceName,jdbcType=VARCHAR},
+      week_date = #{weekDate,jdbcType=TINYINT},
+      begin_time = #{beginTime,jdbcType=TIME},
+      end_time = #{endTime,jdbcType=TIME},
+      complexity = #{complexity,jdbcType=TINYINT},
+      total_amount = #{totalAmount,jdbcType=TINYINT},
+      alive_amount = #{aliveAmount,jdbcType=TINYINT}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

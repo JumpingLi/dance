@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.champion.dance.domain.mapper.MemberCardMapper" >
+  <resultMap id="BaseResultMap" type="com.champion.dance.domain.entity.MemberCard" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="studio_id" property="studioId" jdbcType="VARCHAR" />
+    <result column="member_id" property="memberId" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name_type" property="nameType" jdbcType="TINYINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="activation_time" property="activationTime" jdbcType="TIMESTAMP" />
+    <result column="expiration_time" property="expirationTime" jdbcType="TIMESTAMP" />
+    <result column="remain_count" property="remainCount" jdbcType="INTEGER" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="counselor" property="counselor" jdbcType="VARCHAR" />
+    <result column="operator" property="operator" jdbcType="VARCHAR" />
+    <result column="charge_type" property="chargeType" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, studio_id, member_id, code, name_type, name, type, status, activation_time, expiration_time, 
+    remain_count, amount, counselor, operator, charge_type
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from member_card
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="findByCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from member_card
+    where code = #{code,jdbcType=VARCHAR}
+  </select>
+  <select id="findByMemberId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from member_card
+    where member_id = #{memberId,jdbcType=VARCHAR}
+    AND remain_count <![CDATA[  >= ]]> 1
+    AND expiration_time <![CDATA[  >= ]]> now()
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from member_card
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.champion.dance.domain.entity.MemberCard" >
+    insert into member_card (id, studio_id, member_id, 
+      code, name_type, name, 
+      type, status, activation_time, 
+      expiration_time, remain_count, amount, 
+      counselor, operator, charge_type
+      )
+    values (#{id,jdbcType=VARCHAR}, #{studioId,jdbcType=VARCHAR}, #{memberId,jdbcType=VARCHAR}, 
+      #{code,jdbcType=VARCHAR}, #{nameType,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
+      #{type,jdbcType=TINYINT}, #{status,jdbcType=TINYINT}, #{activationTime,jdbcType=TIMESTAMP}, 
+      #{expirationTime,jdbcType=TIMESTAMP}, #{remainCount,jdbcType=INTEGER}, #{amount,jdbcType=DECIMAL}, 
+      #{counselor,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, #{chargeType,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.champion.dance.domain.entity.MemberCard" >
+    insert into member_card
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="studioId != null" >
+        studio_id,
+      </if>
+      <if test="memberId != null" >
+        member_id,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="nameType != null" >
+        name_type,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="activationTime != null" >
+        activation_time,
+      </if>
+      <if test="expirationTime != null" >
+        expiration_time,
+      </if>
+      <if test="remainCount != null" >
+        remain_count,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+      <if test="counselor != null" >
+        counselor,
+      </if>
+      <if test="operator != null" >
+        operator,
+      </if>
+      <if test="chargeType != null" >
+        charge_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="studioId != null" >
+        #{studioId,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="nameType != null" >
+        #{nameType,jdbcType=TINYINT},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="activationTime != null" >
+        #{activationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expirationTime != null" >
+        #{expirationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remainCount != null" >
+        #{remainCount,jdbcType=INTEGER},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="counselor != null" >
+        #{counselor,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeType != null" >
+        #{chargeType,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.champion.dance.domain.entity.MemberCard" >
+    update member_card
+    <set >
+      <if test="studioId != null" >
+        studio_id = #{studioId,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        member_id = #{memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="nameType != null" >
+        name_type = #{nameType,jdbcType=TINYINT},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=TINYINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="activationTime != null" >
+        activation_time = #{activationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expirationTime != null" >
+        expiration_time = #{expirationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remainCount != null" >
+        remain_count = #{remainCount,jdbcType=INTEGER},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="counselor != null" >
+        counselor = #{counselor,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeType != null" >
+        charge_type = #{chargeType,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.champion.dance.domain.entity.MemberCard" >
+    update member_card
+    set studio_id = #{studioId,jdbcType=VARCHAR},
+      member_id = #{memberId,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      name_type = #{nameType,jdbcType=TINYINT},
+      name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT},
+      status = #{status,jdbcType=TINYINT},
+      activation_time = #{activationTime,jdbcType=TIMESTAMP},
+      expiration_time = #{expirationTime,jdbcType=TIMESTAMP},
+      remain_count = #{remainCount,jdbcType=INTEGER},
+      amount = #{amount,jdbcType=DECIMAL},
+      counselor = #{counselor,jdbcType=VARCHAR},
+      operator = #{operator,jdbcType=VARCHAR},
+      charge_type = #{chargeType,jdbcType=TINYINT}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

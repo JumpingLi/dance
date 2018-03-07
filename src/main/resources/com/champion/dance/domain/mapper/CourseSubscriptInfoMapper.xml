@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.champion.dance.domain.mapper.CourseSubscriptInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.champion.dance.domain.entity.CourseSubscriptInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="course_id" property="courseId" jdbcType="VARCHAR" />
+    <result column="member_id" property="memberId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="course_date" property="courseDate" jdbcType="DATE" />
+    <result column="subscribe_time" property="subscribeTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, course_id, member_id, status, course_date, subscribe_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from course_subscribe_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="findAllByMemberId" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    select
+    count(1)
+    from course_subscribe_info
+    where member_id = #{memberId,jdbcType=VARCHAR} and status !=1
+  </select>
+
+  <select id="findCourseSubscribeByParams" resultType="com.champion.dance.domain.dto.CourseSubscribeDto" parameterType="java.util.Map" >
+    select cs.*,c.teacher_id,c.week_date,c.begin_time,c.end_time,c.dance_name,c.studio_name,mc.type,mc.name,mc.remain_count
+    from course_subscribe_info cs JOIN course c ON cs.course_id=c.id JOIN member_card mc ON cs.member_id=mc.member_id
+    <where>
+      <if test="memberId != null">
+        cs.member_id = #{memberId}
+      </if>
+    </where>
+  </select>
+  <select id="findByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    from course_subscribe_info
+    <where>
+      <if test="memberId != null">
+        member_id = #{memberId}
+      </if>
+      <if test="courseId != null">
+        and course_id = #{courseId}
+      </if>
+      <if test="courseDate != null">
+        and course_date = #{courseDate}
+      </if>
+    </where>
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from course_subscribe_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.champion.dance.domain.entity.CourseSubscriptInfo" >
+    insert into course_subscribe_info (id, course_id, member_id, 
+      status, course_date, subscribe_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{courseId,jdbcType=VARCHAR}, #{memberId,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{courseDate,jdbcType=DATE}, #{subscribeTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.champion.dance.domain.entity.CourseSubscriptInfo" >
+    insert into course_subscribe_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="courseId != null" >
+        course_id,
+      </if>
+      <if test="memberId != null" >
+        member_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="courseDate != null" >
+        course_date,
+      </if>
+      <if test="subscribeTime != null" >
+        subscribe_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="courseId != null" >
+        #{courseId,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="courseDate != null" >
+        #{courseDate,jdbcType=DATE},
+      </if>
+      <if test="subscribeTime != null" >
+        #{subscribeTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.champion.dance.domain.entity.CourseSubscriptInfo" >
+    update course_subscribe_info
+    <set >
+      <if test="courseId != null" >
+        course_id = #{courseId,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        member_id = #{memberId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="courseDate != null" >
+        course_date = #{courseDate,jdbcType=DATE},
+      </if>
+      <if test="subscribeTime != null" >
+        subscribe_time = #{subscribeTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.champion.dance.domain.entity.CourseSubscriptInfo" >
+    update course_subscribe_info
+    set course_id = #{courseId,jdbcType=VARCHAR},
+      member_id = #{memberId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT},
+      course_date = #{courseDate,jdbcType=DATE},
+      subscribe_time = #{subscribeTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,55 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.10.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+group = 'com.champion.dance	'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+test.enabled = false
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	all*.exclude group: "commons-logging", module: "commons-logging"
+	all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+}
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-log4j2:${springBootVersion}")
+	compile('org.springframework.boot:spring-boot-starter-data-redis')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.1')
+	compile('com.github.pagehelper:pagehelper:5.1.2')
+	compile('com.google.guava:guava:18.0')
+	compile('com.mashape.unirest:unirest-java:1.4.7')
+	compile('com.zaxxer:HikariCP:2.4.1')
+	compile('org.aspectj:aspectjrt')
+	compile('org.aspectj:aspectjweaver')
+	compile('commons-lang:commons-lang:2.5')
+	compile('com.aliyun:aliyun-java-sdk-dysmsapi:1.0.0')
+	compile('com.aliyun:aliyun-java-sdk-core:3.3.1')
+	compile fileTree(dir:'libs',include:['*.jar'])
+	runtime('mysql:mysql-connector-java')
+	compileOnly('org.projectlombok:lombok')
+
+	compile group: 'com.alibaba', name: 'fastjson', version: '1.2.46'
+
+	testCompile('org.springframework.boot:spring-boot-starter-test'){
+		exclude group: 'com.vaadin.external.google'
+	}
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+}
