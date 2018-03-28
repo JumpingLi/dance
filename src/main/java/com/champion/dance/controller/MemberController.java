@@ -14,18 +14,23 @@ import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.RandomStringUtils;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,8 +43,9 @@ import java.util.stream.Collectors;
  * Description：会员中心
  */
 @Slf4j
+@Validated
 @RestController
-@CrossOrigin(origins = "*",maxAge = 3600)
+//@CrossOrigin(origins = "*",maxAge = 3600)
 public class MemberController {
     @Autowired
     private MemberService memberService;
@@ -182,12 +188,21 @@ public class MemberController {
                                              @PathVariable String code){
         String openId = (String) request.getAttribute("sessionId");
         Member member = memberService.findByOpenId(openId).orElseThrow(() -> new BusinessException("会员信息异常!"));
+        MemberCard card = memberCardService.findByMemberId(member.getId())
+                .stream()
+                .filter(card1 -> card1.getNameType() == NameType.TIMES_7_TY)
+                .findAny()
+                .orElse(null);
+        if(!Objects.isNull(card)){
+            return new ResultBean<>("你已经有一张体验卡了,快去体验吧！",false);
+        }
         MemberCard memberCard = memberCardService.findByCode(code);
         if(Objects.isNull(memberCard) || !StringUtils.isEmpty(memberCard.getMemberId())){
             return new ResultBean<>("获取体验卡失败,优惠码错误",false);
         }else{
             memberCardService.updateByCardId(MemberCard.builder()
                     .id(memberCard.getId())
+                    .activationTime(Timestamp.valueOf(LocalDateTime.now()))
                     .expirationTime(Timestamp.valueOf(LocalDateTime.now().plusWeeks(1)))
                     .memberId(member.getId())
                     .build());
@@ -201,7 +216,7 @@ public class MemberController {
      * @return
      */
     @RequestMapping(path = {"/member/card/record"},method = RequestMethod.POST)
-    public ResultBean<?> recordMemberCard(@RequestBody MemberCardReq req){
+    public ResultBean<?> recordMemberCard(@RequestBody @Valid  MemberCardReq req){
         Member member = memberService.findByMobile(req.getMobile());
         if(Objects.isNull(member)){
             return new ResultBean<>("系统查无此会员!",false);
@@ -211,67 +226,96 @@ public class MemberController {
         Timestamp expirationTime = null;
         String name = null;
         if(req.getNameType() == NameType.TIMES_1){
-            name = "单次卡";
-            remainCount = 1;
+            name = "单次体验卡";
+            remainCount = 1 + req.getGiveCount();
             type = CardType.TIMES;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(1).plusDays(req.getGiveDays()));
+            MemberCard memberCard = memberCardService.findByMemberId(member.getId()).stream().findAny().orElse(null);
+            if(memberCard != null){
+                return new ResultBean<>("该账号曾开通过" + memberCard.getName(),false);
+            }
         }
+        if(req.getNameType() == NameType.TIMES_50){
+            name = "50次卡";
+            remainCount = 50 + req.getGiveCount();
+            type = CardType.TIMES;
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1).plusDays(req.getGiveDays()));
+        }
+        if(req.getNameType() == NameType.TIMES_12){
+            name = "12次卡";
+            remainCount = 12 + req.getGiveCount();
+            type = CardType.TIMES;
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusDays(45 + req.getGiveDays()));
+        }
+
         if(req.getNameType() == NameType.TIMES_30){
             name = "30次卡";
-            remainCount = 30;
+            remainCount = 30 + req.getGiveCount();
             type = CardType.TIMES;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(6));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(6).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.TIMES_60){
             name = "60次卡";
-            remainCount = 60;
+            remainCount = 60 + req.getGiveCount();
             type = CardType.TIMES;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.TIMES_100){
             name = "100次卡";
-            remainCount = 100;
+            remainCount = 100 + req.getGiveCount();
             type = CardType.TIMES;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.PERIOD_7DAY_CT){
             name = "7天畅跳卡";
             remainCount = 100000;
             type = CardType.PERIOD;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusDays(7));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusDays(7).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.PERIOD_WEEKEND){
             name = "周末年卡";
             remainCount = 100000;
             type = CardType.PERIOD;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.PERIOD_QUARTER_YEAR){
             name = "季卡";
             remainCount = 100000;
             type = CardType.PERIOD;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(3));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(3).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.PERIOD_HALF_YEAR){
             name = "半年卡";
             remainCount = 100000;
             type = CardType.PERIOD;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(6));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(6).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.PERIOD_YEAR){
             name = "年卡";
             remainCount = 100000;
             type = CardType.PERIOD;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusYears(1).plusDays(req.getGiveDays()));
         }
         if(req.getNameType() == NameType.DIAN_PING){
             name = "点评团购卡";
-            remainCount = 1;
+            remainCount = req.getCount() + req.getGiveCount();
             type = CardType.TIMES;
-            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1));
+            expirationTime = Timestamp.valueOf(LocalDateTime.now().plusMonths(1).plusDays(req.getGiveDays()));
+            MemberCard memberCard = memberCardService.findByMemberId(member.getId()).stream().findAny().orElse(null);
+            if(memberCard != null){
+                return new ResultBean<>("该账号曾开通过" + memberCard.getName(),false);
+            }
         }
+        String cardId =RandomStringUtils.randomAlphabetic(2).toUpperCase() +
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYMMdd")) + RandomStringUtils.randomNumeric(5);
+        memberCardBuyService.insertBuyInfo(MemberCardBuyInfo.builder()
+                .memberId(member.getId())
+                .content("购买" + name + ",充值" + req.getAmount() + "元(含赠送" + req.getGiveCount() + "次,赠送" + req.getGiveDays() + "天)")
+                .operator(req.getOperator())
+                .createTime(Timestamp.valueOf(LocalDateTime.now()))
+                .build());
         memberCardService.insertMemberCard(MemberCard.builder()
-                .id(UUID.randomUUID().toString())
+                .id(cardId)
                 .memberId(member.getId())
                 .code(req.getCode())
                 .name(name)
@@ -298,5 +342,11 @@ public class MemberController {
         private String counselor;//顾问
         private String operator;//操作人
         private ChargeType chargeType;//充值类型
+        @Range(min = 0, message = "赠送次数不能为空")
+        private Integer giveCount;//赠送次数
+        @Range(min = 0, message = "赠送天数不能为空")
+        private Integer giveDays;// 赠送天数
+        @Range(min = 1, message = "团购次数不能为空")
+        private Integer count;
     }
 }

@@ -18,4 +18,6 @@ public enum NameType {
     PERIOD_7DAY_CT,//7天畅跳卡
     TIMES_1,//单次卡
     DIAN_PING,//点评团购卡
+    TIMES_50,//50次卡
+    TIMES_12,//12次卡
 }

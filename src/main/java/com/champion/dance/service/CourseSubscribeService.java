@@ -25,4 +25,6 @@ public interface CourseSubscribeService {
     List<CourseSubscribeDto> findCourseSubscribeByParams(Map params, RowBounds rowBounds);
 
     Integer findAllByMemberId(String memberId);
+
+    Integer findAllByCardId(String cardId);
 }

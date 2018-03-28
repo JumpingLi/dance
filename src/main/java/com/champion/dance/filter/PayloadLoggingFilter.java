@@ -24,7 +24,7 @@ public class PayloadLoggingFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         PayloadRequestWrapper wrapper = new PayloadRequestWrapper(request);
 
-        log.info(new StringBuffer("\n")
+        log.info(new StringBuilder("\n")
                 .append("::::::::::::::::::::::::::Request Method: ")
                 .append(request.getMethod())
                 .append("\t")
@@ -37,7 +37,7 @@ public class PayloadLoggingFilter implements Filter {
                         request.getParameterMap().entrySet().stream()
                                 .map(entry -> entry.getKey() + ":" + Arrays.toString(entry.getValue()))
                                 .collect(Collectors.joining(",")) : "")
-                .append(!StringUtils.isEmpty(request.getHeader("sessionId   ")) ? "\n::::::::::::::::::::::::::sessionId:" + String.valueOf(request.getHeader("sessionId")) : "").toString())
+                .append(!StringUtils.isEmpty(request.getHeader("sessionId")) ? "\n::::::::::::::::::::::::::sessionId:" + String.valueOf(request.getHeader("sessionId")) : "").toString())
         ;
         chain.doFilter(wrapper, servletResponse);
     }

@@ -5,10 +5,12 @@ import com.champion.dance.domain.enumeration.CardType;
 import com.champion.dance.domain.enumeration.NameType;
 import com.champion.dance.service.MemberCardService;
 import com.champion.dance.service.TeacherService;
+import com.champion.dance.utils.DateTimeUtil;
 import com.champion.wechat.constant.ConstantWeChat;
 import com.champion.wechat.entity.AccessToken;
 import com.champion.wechat.util.WeixinUtil;
 import com.csvreader.CsvReader;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +27,9 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -63,21 +67,13 @@ public class ServiceTest {
 
     @Test
     public void insertData() throws IOException {
-        CsvReader r = new CsvReader("D:\\data.csv", ',', Charset.forName("GBK"));
+        CsvReader r = new CsvReader("D:\\data.csv", ',', Charset.forName("UTF-8"));
         while (r.readRecord()) {
             String[] arr = r.getValues();
             for(String s:arr){
-//                System.out.println(s);
-                memberCardService.insertMemberCard(MemberCard.builder()
-                        .id(UUID.randomUUID().toString())
-                        .code(s)
-                        .name("7次体验卡")
-                        .nameType(NameType.TIMES_7_TY)
-                        .type(CardType.TIMES)
-                        .remainCount(7)
-                        .operator("系统录入")
-                        .build());
+                System.out.println(s);
             }
+            System.out.println("------这是分割线-----");
         }
     }
 
@@ -93,10 +89,13 @@ public class ServiceTest {
 //        Teacher teacher = (Teacher) redisTemplate.opsForValue().get("jumping");
 
 //        System.out.println(teacher.getName());
-        AccessToken accessToken = WeixinUtil.getAccessToken(ConstantWeChat.APPID,ConstantWeChat.APPSECRET);
-        System.out.println(accessToken.getToken() + "" + accessToken.getExpiresIn());
-        redisTemplate.opsForValue().set(ConstantWeChat.APPID,accessToken.getToken(),accessToken.getExpiresIn()-5, TimeUnit.SECONDS);
-
+//        AccessToken accessToken = WeixinUtil.getAccessToken(ConstantWeChat.APPID,ConstantWeChat.APPSECRET);
+//        System.out.println(accessToken.getToken() + "" + accessToken.getExpiresIn());
+//        redisTemplate.opsForValue().set(ConstantWeChat.APPID,accessToken.getToken(),accessToken.getExpiresIn()-5, TimeUnit.SECONDS);
+//        String str = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYMMdd"));
+//        System.out.println(System.getProperty("sun.arch.data.model"));
+        long days = Duration.between(LocalDateTime.now().plusDays(-10),LocalDateTime.now()).toDays();
+        System.out.println(days);
     }
 
     @Test

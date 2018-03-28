@@ -3,6 +3,7 @@ package com.champion.dance.controller;
 import com.champion.dance.domain.entity.*;
 import com.champion.dance.domain.enumeration.CardType;
 import com.champion.dance.domain.enumeration.CourseSubscribeStatus;
+import com.champion.dance.domain.enumeration.NameType;
 import com.champion.dance.domain.enumeration.StartLevel;
 import com.champion.dance.exception.BusinessException;
 import com.champion.dance.response.ResultBean;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*",maxAge = 3600)
+//@CrossOrigin(origins = "*",maxAge = 3600)
 public class CourseController {
 
     @Autowired
@@ -119,7 +120,7 @@ public class CourseController {
                         if(course.getAliveAmount() == 0){
                             courseVo.setStatus(CourseStatus.IMPLETION);//约满
                         }else{
-                            if(nowLocalTime.plusMinutes(10).isAfter(beginLocalTime)){
+                            if(nowLocalTime.plusMinutes(10).isAfter(beginLocalTime) && localDate.compareTo(LocalDate.now()) == 0){
                                 courseVo.setStatus(CourseStatus.UPCOMING);//即将上课
                             }else{
                                 courseVo.setStatus(CourseStatus.UN_SUBSCRIBE);//可预约
@@ -130,7 +131,16 @@ public class CourseController {
                     if(localDate.compareTo(LocalDate.now()) == 0){
                         courseVo.setStatus(CourseStatus.EXPIRE);//已过期
                     }else{
-                        courseVo.setStatus(CourseStatus.UN_SUBSCRIBE);//可预约
+                        if(courseSubscriptInfo != null){
+                            courseVo.setStatus(CourseStatus.SUBSCRIBED);
+                            courseVo.setSubscribeId(courseSubscriptInfo.getId());//预约id
+                        }else{
+                            if(course.getAliveAmount() == 0){
+                                courseVo.setStatus(CourseStatus.IMPLETION);//约满
+                            }else{
+                                courseVo.setStatus(CourseStatus.UN_SUBSCRIBE);//可预约
+                            }
+                        }
                     }
                 }
             }
@@ -281,12 +291,8 @@ public class CourseController {
                         Course subCourse = courseService.findByCourseId(info.getCourseId());
                         LocalTime subBeginTime = subCourse.getBeginTime().toLocalDateTime().toLocalTime();
 //                        LocalTime subEndTime = subCourse.getEndTime().toLocalDateTime().toLocalTime();
-                        if(info.getStatus() != CourseSubscribeStatus.CANCEL_SUBSCRIBE
-                                && (subBeginTime.compareTo(beginTime) == 0 || (subBeginTime.isAfter(beginTime) && subBeginTime.isBefore(endTime)))){
-                            return true;
-                        }else{
-                            return false;
-                        }
+                        return info.getStatus() != CourseSubscribeStatus.CANCEL_SUBSCRIBE
+                                && (subBeginTime.compareTo(beginTime) == 0 || (subBeginTime.isAfter(beginTime) && subBeginTime.isBefore(endTime)));
                     }).collect(Collectors.toList());
             if(!CollectionUtils.isEmpty(infoList)){
                 return new ResultBean<>("你已有预约课程,请预约其他时间段的课程吧!",false);
@@ -294,16 +300,37 @@ public class CourseController {
             if(course.getAliveAmount() == 0){
                 return new ResultBean<>("课程已约满,下次请早点来哦!",false);
             }
-            MemberCard memberCard = memberCardService.findByMemberId(member.getId())
+
+            List<MemberCard> memberCards = memberCardService.findByMemberId(member.getId());
+            //优先选择 7次和7天卡
+            MemberCard memberCard = memberCards
                     .stream()
-                    .filter(card -> card.getStudioId().equals(course.getStudioId()))//过滤-选择出可用的会员卡
+                    .filter(card -> card.getNameType() == NameType.TIMES_7_TY || card.getNameType() == NameType.PERIOD_7DAY_CT)//过滤-选择出可用的会员卡
                     .findFirst()
-                    .orElseThrow(() -> new BusinessException("您暂无该课程可用的会员卡!"));
+                    .orElse(null);
+            if(memberCard == null){
+                memberCard = memberCards
+                        .stream()
+                        .filter(card -> card.getNameType() == NameType.DIAN_PING || card.getNameType() == NameType.TIMES_1)//过滤-选择出可用的会员卡
+                        .findFirst()
+                        .orElse(null);
+            }
+            if(memberCard == null){
+                memberCard = memberCards
+                        .stream()
+                        .findFirst()
+                        .orElseThrow(() -> new BusinessException("你暂无可用的会员卡!"));
+            }
             if(memberCard.getExpirationTime().toLocalDateTime().isBefore(LocalDateTime.now())){
                 return new ResultBean<>("您的会员卡已过期失效!",false);
             }
             if(memberCard.getType() == CardType.TIMES && memberCard.getRemainCount() < 1){
                 return new ResultBean<>("您的会员卡可用次数不足!",false);
+            }
+            DayOfWeek dayOfWeek = LocalDateTime.now().getDayOfWeek();
+            if(memberCard.getNameType() == NameType.PERIOD_WEEKEND
+                    && dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek == DayOfWeek.SUNDAY){
+                return new ResultBean<>("周末卡只能在周末使用哦!",false);
             }
             String msg;
             if(memberCard.getType() == CardType.TIMES){
@@ -314,7 +341,6 @@ public class CourseController {
             long seconds = 0;
             //预约当天的
             if(subDate.compareTo(LocalDate.now()) == 0){
-
                 if(LocalTime.now().isAfter(beginTime) && LocalTime.now().isBefore(endTime)){
                     return new ResultBean<>("上课中,不能预约了哦!",false);
                 }else if(LocalTime.now().isAfter(endTime)){
@@ -333,8 +359,17 @@ public class CourseController {
             int aliveAmount = course.getAliveAmount() - 1;
             course.setAliveAmount(aliveAmount);
             redisTemplate.opsForValue().set(courseId,course,seconds, TimeUnit.SECONDS);
+            Timestamp expirationTime = memberCard.getExpirationTime();
+            if(courseSubscribeService.findAllByCardId(memberCard.getId()) < 1
+                    && memberCard.getNameType() != NameType.TIMES_1
+                    && memberCard.getNameType() != NameType.DIAN_PING){
+                // 非单次卡、点评团购卡 首次使用有效期往后推延
+                expirationTime = Timestamp.valueOf(expirationTime.toLocalDateTime()
+                        .plusDays(Duration.between(memberCard.getActivationTime().toLocalDateTime(),LocalDateTime.now()).toDays()));
+            }
             courseSubscribeService.insertCourseSubscribe(CourseSubscriptInfo.builder()
                     .courseId(courseId)
+                    .cardId(memberCard.getId())
                     .memberId(member.getId())
                     .courseDate(Date.valueOf(subDate))//只能预约当天和第二天的课程
                     .status(CourseSubscribeStatus.SUBSCRIBED)
@@ -343,6 +378,7 @@ public class CourseController {
             memberCardService.updateByCardId(MemberCard.builder()
                     .id(memberCard.getId())
                     .remainCount(memberCard.getRemainCount() - 1)
+                    .expirationTime(expirationTime)
                     .build());
             //todo 如需要，就短信推送一下吧
             return new ResultBean<>(msg);
@@ -365,8 +401,11 @@ public class CourseController {
         String openId = (String) request.getAttribute("sessionId");
         Member member = memberService.findByOpenId(openId).orElseThrow(() -> new BusinessException("会员信息异常!"));
         CourseSubscriptInfo courseSubscriptInfo = courseSubscribeService.findById(subscribeId);
-        if(Objects.isNull(courseSubscriptInfo) || courseSubscriptInfo.getStatus() == CourseSubscribeStatus.CANCEL_SUBSCRIBE){
+        if(Objects.isNull(courseSubscriptInfo)){
             return new ResultBean<>("预约数据异常!",false);
+        }
+        if(courseSubscriptInfo.getStatus() == CourseSubscribeStatus.CANCEL_SUBSCRIBE){
+            return new ResultBean<>("您的预约已取消,请勿重复操作!",false);
         }
         LocalDate courseDate = courseSubscriptInfo.getCourseDate().toLocalDate();
         if(courseDate.isBefore(LocalDate.now()) || courseDate.isAfter(LocalDate.now().plusDays(1))){
@@ -374,11 +413,7 @@ public class CourseController {
         }
         Course course = (Course) redisTemplate.opsForValue().get(courseSubscriptInfo.getCourseId());
         if(!Objects.isNull(course)) {
-            MemberCard memberCard = memberCardService.findByMemberId(member.getId())
-                    .stream()
-                    .filter(card -> card.getStudioId().equals(course.getStudioId()))//过滤-选择出可用的会员卡
-                    .findFirst()
-                    .orElseThrow(() -> new BusinessException("您暂无该课程可用的会员卡!"));
+            MemberCard memberCard = memberCardService.findByCardId(courseSubscriptInfo.getCardId());
             if(memberCard.getExpirationTime().toLocalDateTime().isBefore(LocalDateTime.now())){
                 return new ResultBean<>("您的会员卡已过期失效!",false);
             }

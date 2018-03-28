@@ -32,7 +32,7 @@ import java.util.Objects;
  * Description：
  */
 @RestController
-@CrossOrigin(origins = "*",maxAge = 3600)
+//@CrossOrigin(origins = "*",maxAge = 3600)
 public class CommentController {
 
     @Autowired
@@ -81,7 +81,7 @@ public class CommentController {
         private String courseId;
         @Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",message = "课程时间格式错误")
         private String courseDate;
-        @NotBlank(message = "预约Id不能为空")
+
         private Integer subscribeId;
     }
 }

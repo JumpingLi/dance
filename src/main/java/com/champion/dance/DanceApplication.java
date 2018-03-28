@@ -12,8 +12,20 @@ import org.springframework.context.annotation.ComponentScan;
 @MapperScan(basePackages = "com.champion.dance.domain.mapper")
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class DanceApplication {
-
+	private static Thread mainThread = Thread.currentThread();
 	public static void main(String[] args) {
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            mainThread.interrupt();
+            while (true) {
+                try {
+                    mainThread.join();
+                    break;
+                } catch (InterruptedException e) {
+                    System.out.println("程序正在结束中，请勿强制结束程序！！！");
+                }
+            }
+            System.out.println("程序正常结束");
+        }));
 		SpringApplication.run(DanceApplication.class, args);
 	}
 }

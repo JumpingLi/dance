@@ -44,4 +44,9 @@ public class MemberCardServiceImpl implements MemberCardService {
     public int insertMemberCard(MemberCard memberCard) {
         return memberCardMapper.insertSelective(memberCard);
     }
+
+    @Override
+    public MemberCard findByCardId(String cardId) {
+        return memberCardMapper.selectByPrimaryKey(cardId);
+    }
 }

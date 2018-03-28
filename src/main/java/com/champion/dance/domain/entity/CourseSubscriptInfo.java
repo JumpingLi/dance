@@ -20,6 +20,8 @@ public class CourseSubscriptInfo {
 
     private String memberId;
 
+    private String cardId;
+
     private CourseSubscribeStatus status;
 
     private Date courseDate;

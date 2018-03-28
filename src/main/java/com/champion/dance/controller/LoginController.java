@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Validated
 @RestController
-@CrossOrigin(origins = "*",maxAge = 3600)
+//@CrossOrigin(origins = "*",maxAge = 3600)
 public class LoginController {
     @Autowired
     private MemberService memberService;
@@ -60,12 +60,12 @@ public class LoginController {
     @RequestMapping(path = {"/wx/code"},method = RequestMethod.GET)
     public void getWechatCode(HttpServletResponse response,
                               @RequestParam String code) throws IOException {
-        Boolean hasKey = stringRedisTemplate.hasKey(code);
-        if(hasKey){
-            response.sendRedirect("http://www.vecdole.com/app/html/to_reserve.html");
-            return;
-        }
-        stringRedisTemplate.opsForValue().set(code,"wechat code",5,TimeUnit.SECONDS);
+//        Boolean hasKey = stringRedisTemplate.hasKey(code);
+//        if(hasKey){
+//            response.sendRedirect("http://www.vecdole.com/app/html/interim.html?pageCode=1");
+//            return;
+//        }
+//        stringRedisTemplate.opsForValue().set(code,"wechat code",5,TimeUnit.SECONDS);
         log.info("------ code:" + code);
         AccessTokenOAuth accessTokenOAuth = OAuthService.getOAuthAccessToken(code);
 //        log.info("------ accessToken:" + accessTokenOAuth.getAccessToken());
@@ -80,15 +80,12 @@ public class LoginController {
                     .openId(openId)
                     .avatarUrl(userWeiXin.getHeadimgurl())
                     .build());
-//            response.sendRedirect("注册H5页面url");http://victorwei.wicp.net/api/wx
-            response.sendRedirect("http://www.vecdole.com/app/html/register.html?openId=" + openId);
+            response.sendRedirect("http://www.vecdole.com/app/html/interim.html?openId=1_Uni5_" + openId);
         }else if(StringUtils.isEmpty(member.getRealName())){
-//            response.sendRedirect("注册H5页面url");
-            response.sendRedirect("http://www.vecdole.com/app/html/register.html?openId=" + openId);
+            response.sendRedirect("http://www.vecdole.com/app/html/interim.html?openId=1_Uni5_" + openId);
         }else{
             // 注册用户,授权成功
-//            response.sendRedirect("我要约课or已约课程or个人中心H5页面");
-            response.sendRedirect("http://www.vecdole.com/app/html/to_reserve.html?openId=" + openId);
+            response.sendRedirect("http://www.vecdole.com/app/html/interim.html?openId=2_Uni5_" + openId);
         }
     }
 
@@ -120,7 +117,7 @@ public class LoginController {
         try {
             AliDayuSms.sendSms(SmsDayuInfo.builder()
                     .phoneNumber(mobile)
-                    .signName("阿里云短信测试专用")
+                    .signName("怡霓信息")
                     .templateCode("SMS_126640360")
                     .templateParam("{\"code\":\"" + authCode + "\"}")//模板参数json串
                     .build());
@@ -134,6 +131,10 @@ public class LoginController {
     @RequestMapping(path = {"/member/register"},method = RequestMethod.POST)
     public ResultBean<?> memberRegister(@RequestBody @Valid RegisterReq req, BindingResult result){
         ParamValidator.paramValidate(result);
+        Member memberMobile = memberService.findByMobile(req.getMobile());
+        if(!Objects.isNull(memberMobile)){
+            return new ResultBean<>("手机号已注册!",false);
+        }
         String authCode = stringRedisTemplate.opsForValue().get(req.getMobile());
         if(!req.getAuthCode().equals(authCode)){
             throw new BusinessException("短信验证码验证错误!");

@@ -29,7 +29,7 @@ public class AopController {
         ResultBean<?> result;
         try {
             result = (ResultBean<?>) pjp.proceed();
-            log.info(pjp.getSignature() + " used time:" + (System.currentTimeMillis() - startTime));
+            log.debug(pjp.getSignature() + " used time:" + (System.currentTimeMillis() - startTime));
         } catch (Throwable e) {
             result = handlerException(pjp, e);
         }

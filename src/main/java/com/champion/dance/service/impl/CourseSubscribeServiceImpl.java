@@ -51,4 +51,9 @@ public class CourseSubscribeServiceImpl implements CourseSubscribeService{
     public Integer findAllByMemberId(String memberId) {
         return courseSubscriptInfoMapper.findAllByMemberId(memberId);
     }
+
+    @Override
+    public Integer findAllByCardId(String cardId) {
+        return courseSubscriptInfoMapper.findAllByCardId(cardId);
+    }
 }

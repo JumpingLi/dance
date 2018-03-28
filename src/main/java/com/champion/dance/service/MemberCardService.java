@@ -21,4 +21,6 @@ public interface MemberCardService {
     MemberCard findByCode(String code);
 
     int insertMemberCard(MemberCard memberCard);
+
+    MemberCard findByCardId(String cardId);
 }

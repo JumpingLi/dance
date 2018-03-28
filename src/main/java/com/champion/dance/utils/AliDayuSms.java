@@ -96,7 +96,7 @@ public class AliDayuSms {
         //发短信
         SendSmsResponse response = sendSms(SmsDayuInfo.builder()
                 .phoneNumber("18512196875")
-                .signName("阿里云短信测试专用")
+                .signName("怡霓信息")
                 .templateCode("SMS_126640360")
                 .templateParam("{\"code\":\"" + authCode + "\"}")//模板参数json串
                 .build());

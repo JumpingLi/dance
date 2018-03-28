@@ -14,4 +14,6 @@ import java.util.List;
 public interface MemberCardBuyService {
 
     List<MemberCardBuyInfo> findByMemberId(String memberId, RowBounds rowBounds);
+
+    int insertBuyInfo(MemberCardBuyInfo buyInfo);
 }

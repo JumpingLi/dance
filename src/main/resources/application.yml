@@ -12,6 +12,7 @@ spring:
 
 server:
   port: 9090
+#  context-path: /api
   servlet-path: /api
 
 logging:

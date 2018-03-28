@@ -25,4 +25,6 @@ public interface CourseSubscriptInfoMapper {
     List<CourseSubscribeDto> findCourseSubscribeByParams(Map params , RowBounds rowBounds);
 
     Integer findAllByMemberId(String memberId);
+
+    Integer findAllByCardId(String cardId);
 }

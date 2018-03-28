@@ -24,4 +24,9 @@ public class MemberCardBuyServiceImpl implements MemberCardBuyService {
     public List<MemberCardBuyInfo> findByMemberId(String memberId, RowBounds rowBounds) {
         return memberCardBuyInfoMapper.findByMemberId(memberId,rowBounds);
     }
+
+    @Override
+    public int insertBuyInfo(MemberCardBuyInfo buyInfo) {
+        return memberCardBuyInfoMapper.insertSelective(buyInfo);
+    }
 }

@@ -5,12 +5,13 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="course_id" property="courseId" jdbcType="VARCHAR" />
     <result column="member_id" property="memberId" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="TINYINT" />
     <result column="course_date" property="courseDate" jdbcType="DATE" />
     <result column="subscribe_time" property="subscribeTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, course_id, member_id, status, course_date, subscribe_time
+    id, course_id, member_id, status, course_date, subscribe_time,card_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -26,9 +27,16 @@
     where member_id = #{memberId,jdbcType=VARCHAR} and status !=1
   </select>
 
+  <select id="findAllByCardId" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    select
+    count(1)
+    from course_subscribe_info
+    where card_id = #{cardId,jdbcType=VARCHAR}
+  </select>
+
   <select id="findCourseSubscribeByParams" resultType="com.champion.dance.domain.dto.CourseSubscribeDto" parameterType="java.util.Map" >
     select cs.*,c.teacher_id,c.week_date,c.begin_time,c.end_time,c.dance_name,c.studio_name,mc.type,mc.name,mc.remain_count
-    from course_subscribe_info cs JOIN course c ON cs.course_id=c.id JOIN member_card mc ON cs.member_id=mc.member_id
+    from course_subscribe_info cs JOIN course c ON cs.course_id=c.id JOIN member_card mc ON cs.card_id=mc.id
     <where>
       <if test="memberId != null">
         cs.member_id = #{memberId}
@@ -58,10 +66,10 @@
   </delete>
   <insert id="insert" parameterType="com.champion.dance.domain.entity.CourseSubscriptInfo" >
     insert into course_subscribe_info (id, course_id, member_id, 
-      status, course_date, subscribe_time
+      status, course_date, subscribe_time,card_id
       )
     values (#{id,jdbcType=INTEGER}, #{courseId,jdbcType=VARCHAR}, #{memberId,jdbcType=VARCHAR}, 
-      #{status,jdbcType=TINYINT}, #{courseDate,jdbcType=DATE}, #{subscribeTime,jdbcType=TIMESTAMP}
+      #{status,jdbcType=TINYINT}, #{courseDate,jdbcType=DATE}, #{subscribeTime,jdbcType=TIMESTAMP},#{cardId,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.champion.dance.domain.entity.CourseSubscriptInfo" >
@@ -75,6 +83,9 @@
       </if>
       <if test="memberId != null" >
         member_id,
+      </if>
+      <if test="cardId != null" >
+        card_id,
       </if>
       <if test="status != null" >
         status,
@@ -96,6 +107,9 @@
       <if test="memberId != null" >
         #{memberId,jdbcType=VARCHAR},
       </if>
+      <if test="cardId != null" >
+        #{cardId,jdbcType=VARCHAR},
+      </if>
       <if test="status != null" >
         #{status,jdbcType=TINYINT},
       </if>
@@ -116,6 +130,9 @@
       <if test="memberId != null" >
         member_id = #{memberId,jdbcType=VARCHAR},
       </if>
+      <if test="cardId != null" >
+        card_id = #{cardId,jdbcType=VARCHAR},
+      </if>
       <if test="status != null" >
         status = #{status,jdbcType=TINYINT},
       </if>
@@ -132,6 +149,7 @@
     update course_subscribe_info
     set course_id = #{courseId,jdbcType=VARCHAR},
       member_id = #{memberId,jdbcType=VARCHAR},
+      card_id = #{cardId,jdbcType=VARCHAR},
       status = #{status,jdbcType=TINYINT},
       course_date = #{courseDate,jdbcType=DATE},
       subscribe_time = #{subscribeTime,jdbcType=TIMESTAMP}
