@@ -329,7 +329,7 @@ public class CourseController {
             }
             DayOfWeek dayOfWeek = LocalDateTime.now().getDayOfWeek();
             if(memberCard.getNameType() == NameType.PERIOD_WEEKEND
-                    && dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek == DayOfWeek.SUNDAY){
+                    && dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY){
                 return new ResultBean<>("周末卡只能在周末使用哦!",false);
             }
             String msg;
