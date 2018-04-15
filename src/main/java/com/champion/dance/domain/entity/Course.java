@@ -38,4 +38,5 @@ public class Course {
 
     private Integer aliveAmount;
 
+
 }

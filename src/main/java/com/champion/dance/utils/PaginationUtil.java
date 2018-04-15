@@ -13,7 +13,7 @@ public class PaginationUtil {
     public static final Integer DEFAULT_LIMIT  = 10;
 
     public static RowBounds getRowBounds(Integer page, Integer limit) {
-        return page != null && limit != null ? new RowBounds(page < 1 ? 1 : page, limit < 1 ? 1 : (limit > 10 ? 10 : limit)) : null;
+        return page != null && limit != null ? new RowBounds(page < 1 ? 1 : page, limit < 1 ? 1 : (limit > 100 ? 100 : limit)) : null;
     }
 
     public static Boolean isPagination(Integer page, Integer limit) {

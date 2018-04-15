@@ -42,6 +42,7 @@
         cs.member_id = #{memberId}
       </if>
     </where>
+    ORDER BY cs.subscribe_time DESC
   </select>
   <select id="findByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select
