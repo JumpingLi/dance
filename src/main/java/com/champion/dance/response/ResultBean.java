@@ -63,4 +63,19 @@ public class ResultBean<T> implements Serializable {
         this.code = FAIL;
         this.success = false;
     }
+
+    public static <T> ResultBean<T> getSuccessResult(T v) {
+        ResultBean<T> result = new ResultBean<>();
+        result.setSuccess(true);
+        result.setData(v);
+        return result;
+    }
+
+    public static <T> ResultBean<T> getFailureResult(int errorCode, String msg) {
+        ResultBean<T> result = new ResultBean<>();
+        result.setSuccess(false);
+        result.setCode(errorCode);
+        result.setMsg(msg);
+        return result;
+    }
 }
