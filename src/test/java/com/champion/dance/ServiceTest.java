@@ -9,7 +9,7 @@ import com.champion.dance.utils.DateTimeUtil;
 import com.champion.wechat.constant.ConstantWeChat;
 import com.champion.wechat.entity.AccessToken;
 import com.champion.wechat.util.WeixinUtil;
-import com.csvreader.CsvReader;
+//import com.csvreader.CsvReader;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,14 +67,14 @@ public class ServiceTest {
 
     @Test
     public void insertData() throws IOException {
-        CsvReader r = new CsvReader("D:\\data.csv", ',', Charset.forName("UTF-8"));
-        while (r.readRecord()) {
-            String[] arr = r.getValues();
-            for(String s:arr){
-                System.out.println(s);
-            }
-            System.out.println("------这是分割线-----");
-        }
+//        CsvReader r = new CsvReader("D:\\data.csv", ',', Charset.forName("UTF-8"));
+//        while (r.readRecord()) {
+//            String[] arr = r.getValues();
+//            for(String s:arr){
+//                System.out.println(s);
+//            }
+//            System.out.println("------这是分割线-----");
+//        }
     }
 
     @Test
