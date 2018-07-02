@@ -52,6 +52,15 @@ public class LoginController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired(required = false)
+    private AliDayuSms aliDayuSms;
+
+    @RequestMapping(path = {"/test"},method = RequestMethod.GET)
+    public ResultBean<?> test(){
+        aliDayuSms.testAsync();
+        return new ResultBean<>("This service provide by champion!");
+    }
+
     @RequestMapping(path = {"/index"},method = RequestMethod.GET)
     public ResultBean<?> index(){
         return new ResultBean<>("This service provide by champion!");
@@ -115,7 +124,7 @@ public class LoginController {
         stringRedisTemplate.opsForValue().set(mobile,authCode,60*5, TimeUnit.SECONDS);
         //todo 阿里通信发送短信验证码
         try {
-            AliDayuSms.sendSms(SmsDayuInfo.builder()
+            aliDayuSms.sendSms(SmsDayuInfo.builder()
                     .phoneNumber(mobile)
                     .signName("怡霓信息")
                     .templateCode("SMS_126640360")

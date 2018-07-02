@@ -11,12 +11,15 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.champion.dance.message.SmsDayuInfo;
 import org.apache.commons.lang.RandomStringUtils;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
+@Component
 public class AliDayuSms {
 
     //产品名称:云通信短信API产品,开发者无需替换
@@ -28,8 +31,12 @@ public class AliDayuSms {
     private static final String accessKeyId = "LTAIYHCr4Ark9diu";
     private static final String accessKeySecret = "d1kpWIGJ1renG00RNVHwPMCW7OKk4i";
 
+    public void testAsync(){
+        System.out.println("Execute method asynchronously: "+ Thread.currentThread().getName());
+    }
+
     @Async
-    public static SendSmsResponse sendSms(SmsDayuInfo smsDayuInfo) throws ClientException {
+    public SendSmsResponse sendSms(SmsDayuInfo smsDayuInfo) throws ClientException {
 
         //可自助调整超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
@@ -62,7 +69,7 @@ public class AliDayuSms {
     }
 
 
-    public static QuerySendDetailsResponse querySendDetails(String bizId) throws ClientException {
+    public  QuerySendDetailsResponse querySendDetails(String bizId) throws ClientException {
 
         //可自助调整超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
@@ -92,9 +99,10 @@ public class AliDayuSms {
     }
 
     public static void main(String[] args) throws ClientException, InterruptedException {
+        AliDayuSms aliDayuSms = new AliDayuSms();
         String authCode = RandomStringUtils.randomNumeric(6);
         //发短信
-        SendSmsResponse response = sendSms(SmsDayuInfo.builder()
+        SendSmsResponse response = aliDayuSms.sendSms(SmsDayuInfo.builder()
                 .phoneNumber("18512196875")
                 .signName("怡霓信息")
                 .templateCode("SMS_126640360")
@@ -110,7 +118,7 @@ public class AliDayuSms {
 
         //查明细
         if(response.getCode() != null && response.getCode().equals("OK")) {
-            QuerySendDetailsResponse querySendDetailsResponse = querySendDetails(response.getBizId());
+            QuerySendDetailsResponse querySendDetailsResponse = aliDayuSms.querySendDetails(response.getBizId());
             System.out.println("短信明细查询接口返回数据----------------");
             System.out.println("Code=" + querySendDetailsResponse.getCode());
             System.out.println("Message=" + querySendDetailsResponse.getMessage());
