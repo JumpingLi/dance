@@ -16,7 +16,7 @@
 *.iml
 *.ipr
 /libs/
-/out/
+out/
 
 ### NetBeans ###
 nbproject/private/
