@@ -15,7 +15,7 @@
 *.iws
 *.iml
 *.ipr
-/libs/
+libs/
 out/
 
 ### NetBeans ###
