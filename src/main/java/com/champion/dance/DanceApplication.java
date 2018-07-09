@@ -7,8 +7,11 @@ import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 
+/**
+ * @author jpli3
+ */
 @ServletComponentScan(basePackages = "com.champion.dance.filter")
-@ComponentScan(basePackages = "com.champion")
+//@ComponentScan(basePackages = "com.champion")
 @MapperScan(basePackages = "com.champion.dance.domain.mapper")
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class DanceApplication {

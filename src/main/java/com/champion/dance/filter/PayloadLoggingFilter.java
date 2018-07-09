@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author jpli3
+ */
 @Slf4j
 @WebFilter(filterName="payloadLoggingFilter",urlPatterns={"/*"})
 public class PayloadLoggingFilter implements Filter {

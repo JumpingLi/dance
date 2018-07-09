@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 
+/**
+ * @author jpli3
+ */
 public class PayloadRequestWrapper extends HttpServletRequestWrapper {
     private final String body;
     public PayloadRequestWrapper(HttpServletRequest request) throws IOException {
@@ -18,12 +21,11 @@ public class PayloadRequestWrapper extends HttpServletRequestWrapper {
             if (inputStream != null) {
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
                 char[] charBuffer = new char[128];
-                int bytesRead = -1;
+                int bytesRead;
                 while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
                     stringBuilder.append(charBuffer, 0, bytesRead);
                 }
             } else {
-                stringBuilder.append("");
             }
         } catch (IOException ex) {
             throw ex;
@@ -43,18 +45,22 @@ public class PayloadRequestWrapper extends HttpServletRequestWrapper {
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes("UTF-8"));
         try (ServletInputStream servletInputStream = new ServletInputStream() {
-            public int read() throws IOException {
+            @Override
+            public int read() {
                 return byteArrayInputStream.read();
             }
 
+            @Override
             public boolean isFinished(){
                 return true;
             }
 
+            @Override
             public boolean isReady(){
                 return true;
             }
 
+            @Override
             public void setReadListener(ReadListener readListener){
 
             }
@@ -62,6 +68,7 @@ public class PayloadRequestWrapper extends HttpServletRequestWrapper {
         }) {
             return servletInputStream;
         }
+
     }
 
     @Override

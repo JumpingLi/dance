@@ -11,13 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @author jpli3
+ */
 @Slf4j
 @WebFilter(filterName="securityFilter",urlPatterns={"/api/member/*","/api/course/*","/api/courses/*","/api/comment/*"})
 public class SecurityFilter implements Filter {
 
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
     }
 

@@ -26,10 +26,12 @@ import javax.validation.ValidatorFactory;
 import java.net.UnknownHostException;
 import java.util.concurrent.Executor;
 
+/**
+ * @author jpli3
+ */
 @Configuration
 @EnableAsync
 @Slf4j
-
 public class DataConfig implements AsyncConfigurer, ApplicationContextAware {
     //应用上下文
     private ApplicationContext applicationContext;

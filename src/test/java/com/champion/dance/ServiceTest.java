@@ -104,7 +104,7 @@ public class ServiceTest {
 //        String url = "/member/courses?page=1&limit=10";
 //        String url = "/member/cards";
 //        String url = "/member-card/buy-info";
-        String url = "/member/card/get/1Q91JQ";
+        String url = "/member/card/get/NX4ZXC";
 //        String url = "/course/detail/009a3f7e-8fd2-43c0-bafe-56117487cdb5/2018-03-01";//课程详情
 //        String url = "/course/comments/009a3f7e-8fd2-43c0-bafe-56117487cdb5";//课程评价列表
 //        String url = "/courses?localDate=2018-03-07";//课程列表
@@ -112,7 +112,7 @@ public class ServiceTest {
 //        String url = "/course/cancel?subscribeId=2";//取消预约
 //        String url = "/member/auth-code/18512196875";
         String responseString = mockMvc.perform(get(url)
-                .requestAttr("sessionId", "otGJPwLwQ5mmI-VV7epeBb-nQB48")
+                .requestAttr("sessionId", "o_fNl1CPm15wWYjspJCbiS3qbufM")
 //                .header("sessionId","123")
         )
                 .andReturn().getResponse().getContentAsString();

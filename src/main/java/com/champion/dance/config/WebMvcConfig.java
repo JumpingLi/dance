@@ -16,6 +16,9 @@ import org.springframework.web.servlet.config.annotation.*;
 
 import java.util.List;
 
+/**
+ * @author jpli3
+ */
 @Slf4j
 @Configuration
 @EnableWebMvc
