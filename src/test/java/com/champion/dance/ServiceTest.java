@@ -1,5 +1,6 @@
 package com.champion.dance;
 
+import com.champion.dance.domain.dao.MemberCardDao;
 import com.champion.dance.domain.entity.MemberCard;
 import com.champion.dance.domain.enumeration.CardType;
 import com.champion.dance.domain.enumeration.NameType;
@@ -56,6 +57,9 @@ public class ServiceTest {
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
 
+    @Autowired
+    private MemberCardDao memberCardDao;
+
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -94,8 +98,15 @@ public class ServiceTest {
 //        redisTemplate.opsForValue().set(ConstantWeChat.APPID,accessToken.getToken(),accessToken.getExpiresIn()-5, TimeUnit.SECONDS);
 //        String str = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYMMdd"));
 //        System.out.println(System.getProperty("sun.arch.data.model"));
-        long days = Duration.between(LocalDateTime.now().plusDays(-10),LocalDateTime.now()).toDays();
-        System.out.println(days);
+//        long days = Duration.between(LocalDateTime.now().plusDays(-10),LocalDateTime.now()).toDays();
+//        System.out.println(days);
+        System.out.println("--------------1-------------------");
+        memberCardDao.findCardById("AA18053130208");
+        System.out.println("--------------2-------------------");
+        memberCardDao.findCardById("AA18053130208");
+        System.out.println("--------------3-------------------");
+        memberCardDao.findCardById("AA18053130208");
+
     }
 
     @Test

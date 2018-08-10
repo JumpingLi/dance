@@ -6,6 +6,7 @@
         <setting name="lazyLoadingEnabled" value="true"/>
         <setting name="aggressiveLazyLoading" value="false"/>
         <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+        <setting name="cacheEnabled" value="true"/>
     </settings>
     <typeHandlers>
         <!---->
