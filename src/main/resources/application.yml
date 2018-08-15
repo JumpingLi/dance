@@ -11,7 +11,7 @@ spring:
       charset: UTF-8
 
 server:
-  port: 9090
+  port: 9092
 #  context-path: /api
   servlet-path: /api
 
