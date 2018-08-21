@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -43,6 +44,12 @@ public class PayloadLoggingFilter implements Filter {
                 .append(!StringUtils.isEmpty(request.getHeader("sessionId")) ? "\n::::::::::::::::::::::::::sessionId:" + String.valueOf(request.getHeader("sessionId")) : "").toString())
         ;
         chain.doFilter(wrapper, servletResponse);
+        PayloadResponseWrapper responseWrapper = new PayloadResponseWrapper((HttpServletResponse)servletResponse);
+        chain.doFilter(wrapper, responseWrapper);
+        ServletOutputStream output = servletResponse.getOutputStream();
+        output.write(responseWrapper.getBytes());
+        output.flush();
+        log.info("\n" + "::::::::::::::::::::::::::Response:" + new String(responseWrapper.getBytes()));
     }
 
     @Override

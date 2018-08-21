@@ -12,8 +12,9 @@ spring:
 
 server:
   port: 9090
+  servlet-path:
 #  context-path: /api
-  servlet-path: /api
+#  servlet-path: /api
 
 logging:
   config: classpath:log4j2.xml

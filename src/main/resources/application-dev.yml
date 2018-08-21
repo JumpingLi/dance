@@ -4,8 +4,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     name: main
-    url: jdbc:mysql://127.0.0.1:3306/jumping_database?
-    characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&useAffectedRows=true
+    url: jdbc:mysql://127.0.0.1:3306/jumping_database?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&useAffectedRows=true
     username: root
     password: Champion@2018
     hikari:
